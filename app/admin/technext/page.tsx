@@ -54,12 +54,23 @@ export default async function AdminTechnextPage({ searchParams }: { searchParams
         <Stat label="Rejected" value={count("rejected")} />
         <Stat label="Cancelled" value={count("cancelled")} />
       </div>
-      <div className="mb-4 flex flex-wrap gap-2">
-        {["all", "pending", "approved", "rejected", "cancelled"].map((s) => (
-          <Link key={s} href={`/admin/technext?status=${s}`} className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize ${s === status ? "bg-brand-primary text-white" : "border border-slate-300 bg-white text-slate-700"}`}>
-            {s}
-          </Link>
-        ))}
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-2">
+          {["all", "pending", "approved", "rejected", "cancelled"].map((s) => (
+            <Link key={s} href={`/admin/technext?status=${s}`} className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize ${s === status ? "bg-brand-primary text-white" : "border border-slate-300 bg-white text-slate-700"}`}>
+              {s}
+            </Link>
+          ))}
+        </div>
+        <a
+          href="/api/admin/export?scope=technext&format=xlsx"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Export Stalls (Excel .xlsx)
+        </a>
       </div>
       {bookings.length === 0 ? (
         <Empty>No bookings{status !== "all" ? ` with status ${status}` : " yet"}.</Empty>
