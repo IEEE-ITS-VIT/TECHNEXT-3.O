@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "@/components/cms/EImage";
 import E from "@/components/cms/E";
 import { SITE, SITE_NAME } from "@/lib/site";
 
@@ -17,7 +18,6 @@ export default function SiteFooter({ links }: { links: { icetite: string; bolt: 
           { label: "Book a stall", href: "/register" },
           { label: "Expo categories", href: "/#categories" },
         ];
-  const other = SITE === "bolt" ? { label: "TechNext '28 expo", href: links.technext } : { label: "BOLT 3.0 hackathon", href: links.bolt };
 
   return (
     <footer className="bg-brand-primary-dark text-white/80">
@@ -51,18 +51,24 @@ export default function SiteFooter({ links }: { links: { icetite: string; bolt: 
           <p className="text-xs font-bold uppercase tracking-wider text-white/60">
             <E f="c.SiteFooter">{"Also at VIT"}</E>
           </p>
-          <ul className="mt-3 space-y-2 text-sm">
+          <ul className="mt-3 space-y-3 text-sm">
             <li>
-              <a href={links.icetite} className="hover:text-white">
-                ic-ETITE&apos;28 conference
+              <a href={links.icetite} className="inline-flex items-center gap-2 hover:text-white group">
+                <div className="relative h-5 w-20 shrink-0 bg-white/10 rounded-md p-0.5 border border-white/15">
+                  <Image src="/logos/ic-etite28-cropped-transparent.png" alt="ic-ETITE'28" fill sizes="80px" className="object-contain" />
+                </div>
+                <span className="group-hover:underline">ic-ETITE&apos;28 conference</span>
               </a>
             </li>
             <li>
-              <a href={other.href} className="hover:text-white">
-                {other.label}
+              <a href={links.bolt} className="inline-flex items-center gap-2 hover:text-white group">
+                <div className="relative h-5 w-20 shrink-0 bg-white/10 rounded-md p-0.5 border border-white/15">
+                  <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0" fill sizes="80px" className="object-contain" />
+                </div>
+                <span className="group-hover:underline">BOLT 3.0 hackathon</span>
               </a>
             </li>
-            <li>
+            <li className="pt-1">
               <a href="mailto:icetiteconference@vit.ac.in" className="hover:text-white">
                 icetiteconference@vit.ac.in
               </a>

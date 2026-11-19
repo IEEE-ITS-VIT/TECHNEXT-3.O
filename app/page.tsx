@@ -8,8 +8,8 @@ import Image from "@/components/cms/EImage";
 import GallerySlideshow, { GalleryItem } from "@/components/GallerySlideshow";
 import TechNextFloatingReturn from "@/components/TechNextFloatingReturn";
 import {
-  ArrowLeft,
   ArrowRight,
+  ArrowUpRight,
   Cpu,
   Layers,
   Award,
@@ -315,15 +315,30 @@ export default async function TechNextPage() {
       {/* ── HERO SECTION (MATCHES IC-ETITE HOME NAVY BG) ── */}
       <section id="hero" className="relative pt-10 pb-16 sm:pt-14 sm:pb-24 overflow-hidden bg-brand-primary border-b border-white/15 text-white">
         <div className="container-x">
-          {/* Top Left Return Button - ONLY ONE ON THE PAGE */}
-          <div className="flex items-center justify-between mb-8">
-            <a
-              href={settings.links.icetite}
-              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full border border-white/25 shadow-sm transition-all hover:scale-105"
-            >
-              <ArrowLeft className="w-4 h-4 text-[#84E320]" />
-              <span><E f="technext">{"ic-ETITE'28 Conference"}</E></span>
-            </a>
+          {/* Top Return / Portal Buttons */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <a
+                href={settings.links.icetite}
+                className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-full border border-white/25 shadow-sm transition-all hover:scale-105"
+              >
+                <div className="relative h-4 w-16 sm:w-20 shrink-0">
+                  <Image src="/logos/ic-etite28-cropped-transparent.png" alt="ic-ETITE'28" fill sizes="80px" className="object-contain" />
+                </div>
+                <span><E f="technext">{"Conference"}</E></span>
+              </a>
+              {settings.links.bolt && (
+                <a
+                  href={settings.links.bolt}
+                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white/90 hover:text-white bg-brand-primary-dark hover:bg-[#00244D] px-3.5 py-2 rounded-full border border-[#CCFF00] shadow-[0_0_12px_rgba(204,255,0,0.25)] transition-all hover:scale-105"
+                >
+                  <div className="relative h-4 w-14 sm:w-18 shrink-0">
+                    <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0" fill sizes="72px" className="object-contain" />
+                  </div>
+                  <span><E f="technext">{"Hackathon"}</E></span>
+                </a>
+              )}
+            </div>
           </div>
 
           <div className="max-w-4xl mx-auto text-center space-y-6">
@@ -442,6 +457,39 @@ export default async function TechNextPage() {
                 </li>
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── CO-LOCATED WITH BOLT 3.0 HACKATHON ── */}
+      <section className="py-8 bg-gradient-to-r from-slate-900 via-brand-primary-dark to-[#0B1A30] text-white border-b border-white/10">
+        <div className="container-x">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl bg-white/5 border border-white/15 backdrop-blur-sm">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
+              <div className="relative h-12 sm:h-14 w-44 sm:w-52 shrink-0 bg-brand-primary-dark p-2 rounded-2xl border-2 border-[#CCFF00]/60 shadow-[0_0_20px_rgba(204,255,0,0.2)]">
+                <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0 National Flagship Hackathon" fill sizes="208px" className="object-contain" />
+              </div>
+              <div>
+                <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-[#CCFF00] bg-[#CCFF00]/15 px-2.5 py-0.5 rounded-full border border-[#CCFF00]/30 mb-1">
+                  <E f="technext">{"Co-Located National Event"}</E>
+                </span>
+                <h3 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  <E f="technext">{"BOLT 3.0 · National Flagship 24-Hour Hackathon"}</E>
+                </h3>
+                <p className="mt-1 text-sm text-white/80 max-w-2xl leading-relaxed">
+                  <E f="technext">{"Held alongside TechNext '28 at Anna Auditorium, VIT Vellore. 24-hour rapid prototyping sprint, cash awards, pre-incubation grants, and live investor pitches."}</E>
+                </p>
+              </div>
+            </div>
+            {settings.links.bolt && (
+              <a
+                href={settings.links.bolt}
+                className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#CCFF00] to-[#b3e600] px-5 py-3 text-sm font-bold text-slate-950 shadow-lg transition-all hover:scale-105 hover:brightness-105"
+              >
+                <span><E f="technext">{"Visit BOLT 3.0"}</E></span>
+                <ArrowUpRight className="h-4 w-4 text-slate-950" />
+              </a>
+            )}
           </div>
         </div>
       </section>

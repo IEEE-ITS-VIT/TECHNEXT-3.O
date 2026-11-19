@@ -7,7 +7,7 @@ import { ArrowUpRight, LayoutDashboard, LogIn, Menu, X } from "lucide-react";
 import E from "@/components/cms/E";
 
 // Top navigation of the TechNext '28 website.
-export default function TechNextNavbar({ icetiteUrl }: { icetiteUrl: string }) {
+export default function TechNextNavbar({ icetiteUrl, boltUrl = "" }: { icetiteUrl: string; boltUrl?: string }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   useEffect(() => setLoggedIn(/(?:^|;\s*)technext_logged_in=1/.test(document.cookie)), []);
@@ -49,12 +49,23 @@ export default function TechNextNavbar({ icetiteUrl }: { icetiteUrl: string }) {
           <a
             href={icetiteUrl}
             title="ic-ETITE'28 conference website"
-            className="hidden sm:flex items-center gap-2 bg-white/10 hover:bg-white/20 px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/20"
+            className="hidden sm:flex items-center gap-2 bg-white/10 hover:bg-white/20 px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/20 transition-all hover:scale-105"
           >
             <div className="relative h-6 sm:h-7 w-20 sm:w-24">
               <Image src="/logos/ic-etite28-cropped-transparent.png" alt="ic-ETITE'28 Conference" fill sizes="96px" className="object-contain" priority />
             </div>
           </a>
+          {boltUrl && (
+            <a
+              href={boltUrl}
+              title="BOLT 3.0 National Flagship Hackathon"
+              className="hidden md:flex items-center justify-center h-8 sm:h-9 px-2.5 sm:px-3 rounded-full bg-brand-primary-dark hover:bg-[#00244D] border border-[#CCFF00] shadow-[0_0_12px_rgba(204,255,0,0.25)] transition-all hover:scale-105 shrink-0"
+            >
+              <div className="relative h-4 sm:h-5 w-14 sm:w-20">
+                <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0" fill sizes="80px" className="object-contain" priority />
+              </div>
+            </a>
+          )}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="lg:hidden p-2 rounded-xl bg-white/10 border border-white/20 text-white hover:bg-white/20"
@@ -82,13 +93,27 @@ export default function TechNextNavbar({ icetiteUrl }: { icetiteUrl: string }) {
               </Link>
             ))}
           </div>
-          <div className="pt-3 border-t border-white/10">
-            <a href={icetiteUrl} className="w-full py-3 px-4 rounded-xl bg-brand-secondary text-white font-bold text-sm flex items-center justify-center gap-2">
+          <div className="pt-3 border-t border-white/10 space-y-2">
+            <a href={icetiteUrl} className="w-full py-2.5 px-4 rounded-xl bg-brand-secondary text-white font-bold text-sm flex items-center justify-center gap-2">
+              <div className="relative h-5 w-20 shrink-0">
+                <Image src="/logos/ic-etite28-cropped-transparent.png" alt="ic-ETITE'28" fill sizes="80px" className="object-contain" />
+              </div>
               <span>
-                <E f="c.TechNextNavbar">{"ic-ETITE'28 conference website"}</E>
+                <E f="c.TechNextNavbar">{"ic-ETITE'28 conference"}</E>
               </span>
               <ArrowUpRight className="w-4 h-4 text-[#84E320]" />
             </a>
+            {boltUrl && (
+              <a href={boltUrl} className="w-full py-2.5 px-4 rounded-xl bg-brand-primary-dark text-white font-bold text-sm flex items-center justify-center gap-2 border border-[#CCFF00]/40">
+                <div className="relative h-5 w-20 shrink-0">
+                  <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0" fill sizes="80px" className="object-contain" />
+                </div>
+                <span>
+                  <E f="c.TechNextNavbar">{"BOLT 3.0 hackathon"}</E>
+                </span>
+                <ArrowUpRight className="w-4 h-4 text-[#CCFF00]" />
+              </a>
+            )}
           </div>
         </div>
       )}
