@@ -441,9 +441,9 @@ export default async function TechNextPage() {
         <div className="container-x">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl bg-white/5 border border-white/15 backdrop-blur-sm">
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
-              <div className="relative h-14 sm:h-16 w-52 sm:w-60 md:w-64 shrink-0 bg-brand-primary-dark px-4 py-2.5 rounded-2xl border-2 border-[#CCFF00]/60 shadow-[0_0_20px_rgba(204,255,0,0.2)] flex items-center justify-center">
-                <div className="relative h-8 sm:h-9 w-full">
-                  <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0 National Flagship Hackathon" fill sizes="(max-width: 640px) 208px, 256px" className="object-contain object-center" />
+              <div className="relative h-20 w-64 sm:w-72 md:w-80 shrink-0 bg-white/10 backdrop-blur-md px-6 py-4 rounded-2xl border-2 border-[#CCFF00]/70 shadow-[0_0_24px_rgba(204,255,0,0.22)] flex items-center justify-center">
+                <div className="relative h-9 w-full max-w-[210px]">
+                  <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0 National Flagship Hackathon" fill sizes="220px" className="object-contain object-center" priority />
                 </div>
               </div>
               <div>
