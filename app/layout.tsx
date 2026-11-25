@@ -54,7 +54,13 @@ export const metadata: Metadata = {
   description:
     "TechNext '28 is the national industrial expo and innovation showcase at VIT Vellore, held alongside ic-ETITE'28: industry, startup and student stalls, live demos and awards.",
   keywords: ["TechNext '28", "TechNext expo", "industrial expo VIT", "innovation showcase", "startup stalls", "VIT Vellore", "ic-ETITE'28"],
-  icons: { icon: "/logos/technext-logo.png" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+  },
   category: "technology",
   openGraph: {
     title: "TechNext '28 — National Industrial Expo & Innovation Showcase",
