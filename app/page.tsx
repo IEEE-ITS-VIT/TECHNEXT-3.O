@@ -440,10 +440,10 @@ export default async function TechNextPage() {
       <section className="py-8 bg-gradient-to-r from-slate-900 via-brand-primary-dark to-[#0B1A30] text-white border-b border-white/10">
         <div className="container-x">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 sm:p-8 rounded-3xl bg-white/5 border border-white/15 backdrop-blur-sm">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
-              <div className="relative h-20 w-64 sm:w-72 md:w-80 shrink-0 bg-white/10 backdrop-blur-md px-6 py-4 rounded-2xl border-2 border-[#CCFF00]/70 shadow-[0_0_24px_rgba(204,255,0,0.22)] flex items-center justify-center">
-                <div className="relative h-9 w-full max-w-[210px]">
-                  <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0 National Flagship Hackathon" fill sizes="220px" className="object-contain object-center" priority />
+            <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+              <div className="relative h-20 sm:h-22 w-64 sm:w-72 md:w-80 shrink-0 bg-white/10 backdrop-blur-md px-6 py-4 rounded-2xl border-2 border-[#CCFF00]/70 shadow-[0_0_24px_rgba(204,255,0,0.22)] flex items-center justify-center">
+                <div className="relative h-9 w-full max-w-[200px] translate-y-1 sm:translate-y-1.5">
+                  <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0 National Flagship Hackathon" fill sizes="200px" className="object-contain object-center" priority />
                 </div>
               </div>
               <div>
