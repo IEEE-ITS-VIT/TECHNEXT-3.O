@@ -315,31 +315,6 @@ export default async function TechNextPage() {
       {/* ── HERO SECTION (MATCHES IC-ETITE HOME NAVY BG) ── */}
       <section id="hero" className="relative pt-10 pb-16 sm:pt-14 sm:pb-24 overflow-hidden bg-brand-primary border-b border-white/15 text-white">
         <div className="container-x">
-          {/* Top Return / Portal Buttons */}
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <a
-                href={settings.links.icetite}
-                className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white/90 hover:text-white bg-white/10 hover:bg-white/20 px-3.5 py-2 rounded-full border border-white/25 shadow-sm transition-all hover:scale-105"
-              >
-                <div className="relative h-4 w-16 sm:w-20 shrink-0">
-                  <Image src="/logos/ic-etite28-cropped-transparent.png" alt="ic-ETITE'28" fill sizes="80px" className="object-contain" />
-                </div>
-                <span><E f="technext">{"Conference"}</E></span>
-              </a>
-              {settings.links.bolt && (
-                <a
-                  href={settings.links.bolt}
-                  className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white/90 hover:text-white bg-brand-primary-dark hover:bg-[#00244D] px-3.5 py-2 rounded-full border border-[#CCFF00] shadow-[0_0_12px_rgba(204,255,0,0.25)] transition-all hover:scale-105"
-                >
-                  <div className="relative h-4 w-14 sm:w-18 shrink-0">
-                    <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0" fill sizes="72px" className="object-contain" />
-                  </div>
-                  <span><E f="technext">{"Hackathon"}</E></span>
-                </a>
-              )}
-            </div>
-          </div>
 
           <div className="max-w-4xl mx-auto text-center space-y-6">
             {/* TechNext '28 Official Brand Logo */}
