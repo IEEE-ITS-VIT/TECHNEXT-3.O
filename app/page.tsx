@@ -459,7 +459,7 @@ export default async function TechNextPage() {
             {settings.links.bolt && (
               <a
                 href={settings.links.bolt}
-                className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#CCFF00] to-[#b3e600] px-5 py-3 text-sm font-bold text-slate-950 shadow-lg transition-all hover:scale-105 hover:brightness-105"
+                className="shrink-0 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-[#CCFF00] to-[#b3e600] px-6 py-3 text-sm font-bold text-slate-950 shadow-lg transition-all hover:scale-105 hover:brightness-105"
               >
                 <span><E f="technext">{"Visit BOLT 3.0"}</E></span>
                 <ArrowUpRight className="h-4 w-4 text-slate-950" />
@@ -579,7 +579,7 @@ export default async function TechNextPage() {
           <div className="pt-4 flex items-center justify-center">
             <a
               href={settings.links.bolt}
-              className="bg-brand-primary hover:bg-brand-primary-hover text-white font-bold text-sm sm:text-base py-3.5 px-7 rounded-xl inline-flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md"
+              className="bg-brand-primary hover:bg-brand-primary-hover text-white font-bold text-sm sm:text-base py-3.5 px-8 rounded-full inline-flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md"
             >
               <span><E f="technext">{"Explore BOLT 3.0 Hackathon"}</E></span>
               <ArrowRight className="w-4 h-4 text-[#84E320]" />

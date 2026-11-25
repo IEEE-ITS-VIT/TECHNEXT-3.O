@@ -41,7 +41,7 @@ export default function TechNextNavbar({ icetiteUrl, boltUrl = "" }: { icetiteUr
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Link
             href={account.href}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#84E320] px-3.5 py-1.5 text-sm font-bold text-brand-primary shadow-sm hover:brightness-95"
+            className="inline-flex items-center justify-center gap-1.5 h-9 rounded-full bg-[#84E320] px-4 text-sm font-bold text-brand-primary shadow-sm hover:brightness-95 transition-all shrink-0"
           >
             {loggedIn ? <LayoutDashboard className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
             <span className="hidden sm:inline">{account.label}</span>
@@ -49,9 +49,9 @@ export default function TechNextNavbar({ icetiteUrl, boltUrl = "" }: { icetiteUr
           <a
             href={icetiteUrl}
             title="ic-ETITE'28 conference website"
-            className="hidden sm:flex items-center gap-2 bg-white/10 hover:bg-white/20 px-2.5 sm:px-3 py-1.5 rounded-xl border border-white/20 transition-all hover:scale-105"
+            className="hidden sm:inline-flex items-center justify-center h-9 px-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-105 shrink-0"
           >
-            <div className="relative h-6 sm:h-7 w-20 sm:w-24">
+            <div className="relative h-4 sm:h-5 w-20 sm:w-24">
               <Image src="/logos/ic-etite28-cropped-transparent.png" alt="ic-ETITE'28 Conference" fill sizes="96px" className="object-contain" priority />
             </div>
           </a>
@@ -59,9 +59,9 @@ export default function TechNextNavbar({ icetiteUrl, boltUrl = "" }: { icetiteUr
             <a
               href={boltUrl}
               title="BOLT 3.0 National Flagship Hackathon"
-              className="hidden md:flex items-center justify-center h-8 sm:h-9 px-2.5 sm:px-3 rounded-full bg-brand-primary-dark hover:bg-[#00244D] border border-[#CCFF00] shadow-[0_0_12px_rgba(204,255,0,0.25)] transition-all hover:scale-105 shrink-0"
+              className="hidden md:inline-flex items-center justify-center h-9 px-3.5 rounded-full bg-brand-primary-dark hover:bg-[#00244D] border border-[#CCFF00] shadow-[0_0_12px_rgba(204,255,0,0.25)] transition-all hover:scale-105 shrink-0"
             >
-              <div className="relative h-4 sm:h-5 w-14 sm:w-20">
+              <div className="relative h-4 sm:h-5 w-16 sm:w-20">
                 <Image src="/logos/bolt-logo-white.png" alt="BOLT 3.0" fill sizes="80px" className="object-contain" priority />
               </div>
             </a>
