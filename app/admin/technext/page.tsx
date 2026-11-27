@@ -3,7 +3,7 @@ import { all, parseJson } from "@/lib/db";
 import { formatInr, getSettings } from "@/lib/settings";
 import { fmtIst } from "@/lib/portal/actions";
 import { PAYMENT_STATUSES } from "@/lib/payments";
-import { updateTechnextBookingAction } from "@/app/actions/admin-records";
+import { processRefundAction, updateTechnextBookingAction } from "@/app/actions/admin-records";
 import ScopeTools from "@/components/admin/ScopeTools";
 import SubmitButton from "@/components/portal/SubmitButton";
 import { Card, Empty, Field, Flash, PortalPage, Stat, StatusBadge, inputCls } from "@/components/portal/ui";
@@ -148,13 +148,31 @@ export default async function AdminTechnextPage({ searchParams }: { searchParams
                     <input name="payment_amount" type="number" min={0} defaultValue={b.payment_amount} className={small} />
                   </Field>
                   <Field label="Payment status">
-                    <select name="payment_status" defaultValue={b.payment_status} className={small}>
-                      {PAYMENT_STATUSES.map((s) => (
-                        <option key={s} value={s}>
-                          {s.replace("_", " ")}
-                        </option>
-                      ))}
-                    </select>
+                    {b.payment_status === "paid" ? (
+                      <div className="flex flex-col gap-1.5 pt-1">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-green-100 text-green-800 border border-green-200 shadow-xs">
+                          <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                          PAID (CONFIRMED &amp; LOCKED)
+                        </span>
+                        <input type="hidden" name="payment_status" value="paid" />
+                        <span className="text-[11px] text-slate-500">Confirmed via payment gateway. Status is locked and cannot be edited manually.</span>
+                      </div>
+                    ) : b.payment_status === "refunded" ? (
+                      <div className="flex flex-col gap-1.5 pt-1">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200 shadow-xs">
+                          REFUNDED
+                        </span>
+                        <input type="hidden" name="payment_status" value="refunded" />
+                      </div>
+                    ) : (
+                      <select name="payment_status" defaultValue={b.payment_status} className={small}>
+                        {PAYMENT_STATUSES.filter((s) => s !== "paid" || settings.payments.provider !== "vit").map((s) => (
+                          <option key={s} value={s}>
+                            {s.replace("_", " ")}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </Field>
                   <Field label="Payment reference / UTR">
                     <input name="payment_ref" defaultValue={b.payment_ref ?? ""} className={small} />
@@ -169,6 +187,35 @@ export default async function AdminTechnextPage({ searchParams }: { searchParams
                     <SubmitButton pendingText="Saving…">Save</SubmitButton>
                   </div>
                 </form>
+
+                {b.payment_status === "paid" && (
+                  <div className="mt-4 pt-4 border-t border-slate-200">
+                    <details className="rounded-xl border border-rose-200 bg-rose-50/50 p-4">
+                      <summary className="cursor-pointer text-xs font-bold text-rose-700 hover:text-rose-800 flex items-center justify-between">
+                        <span>Issue Refund for this Booking</span>
+                        <span className="text-[11px] font-normal text-rose-600">Requires ieeeitsvitscore@gmail.com Password</span>
+                      </summary>
+                      <form action={processRefundAction} className="mt-3 space-y-3 pt-3 border-t border-rose-200/80">
+                        <input type="hidden" name="purpose" value="technext" />
+                        <input type="hidden" name="id" value={b.id} />
+                        <input type="hidden" name="back" value={`/admin/technext?status=${status}#b-${b.id}`} />
+                        <Field label="Refund Authorization Password" hint="Required. Set in ieeeitsvitscore@gmail.com profile.">
+                          <input name="refund_password" type="password" required className={small} placeholder="Enter refund authorization password" />
+                        </Field>
+                        <Field label="Refund Reason / Notes">
+                          <input name="refund_reason" type="text" className={small} placeholder="e.g. Delegate cancellation, requested refund" />
+                        </Field>
+                        <SubmitButton
+                          className="!bg-rose-600 hover:!bg-rose-700 text-white !py-2 !px-4 !text-xs font-bold rounded-lg shadow-sm"
+                          pendingText="Processing refund…"
+                          confirm={`Are you sure you want to refund ${formatInr(b.payment_amount)} to ${b.organization_name}? This will cancel the booking.`}
+                        >
+                          Confirm &amp; Authorize Refund
+                        </SubmitButton>
+                      </form>
+                    </details>
+                  </div>
+                )}
               </div>
             </details>
           ))}

@@ -39,11 +39,28 @@ export async function updateTechnextBookingAction(fd: FormData) {
   await guarded(back, async () => {
     const status = str(fd, "status", 20);
     if (!["pending", "approved", "rejected", "cancelled"].includes(status)) throw new PortalError("Invalid status.");
-    const before = await first<{ status: string; email: string; contact_name: string; organization_name: string; stall_type: string }>(
-      "SELECT status, email, contact_name, organization_name, stall_type FROM technext_bookings WHERE id = ?",
+    const before = await first<{ status: string; email: string; contact_name: string; organization_name: string; stall_type: string; payment_status: string }>(
+      "SELECT status, email, contact_name, organization_name, stall_type, payment_status FROM technext_bookings WHERE id = ?",
       [id]
     );
     if (!before) throw new PortalError("Booking not found.");
+
+    const requestedPayment = payment(fd);
+
+    // Rule 1: If once payment is paid and confirmed through API no one can edit
+    if (before.payment_status === "paid" && requestedPayment !== "paid") {
+      throw new PortalError("This booking is paid and confirmed. Payment status is locked and cannot be changed manually (use the Refund action if authorized).");
+    }
+    if (before.payment_status === "refunded" && requestedPayment !== "refunded") {
+      throw new PortalError("This booking has been refunded and its payment status cannot be altered.");
+    }
+
+    // Rule 2: If API is configured the payment status cannot be changed manually
+    const settings = await getSettings();
+    if (settings.payments.provider === "vit" && before.payment_status !== "paid" && requestedPayment === "paid") {
+      throw new PortalError("Payment API is configured. Payment status is updated automatically through the gateway callback and cannot be manually marked as paid.");
+    }
+
     const amount = Math.max(0, Math.round(Number(fd.get("payment_amount")) || 0));
     const notes = str(fd, "admin_notes", 1000);
     await run("UPDATE technext_bookings SET status = ?, admin_notes = ?, payment_link = ?, payment_amount = ?, updated_at = ? WHERE id = ?", [
@@ -54,7 +71,7 @@ export async function updateTechnextBookingAction(fd: FormData) {
       now(),
       id,
     ]);
-    await applyPaymentStatus("technext", id, payment(fd), str(fd, "payment_ref", 120) || null);
+    await applyPaymentStatus("technext", id, requestedPayment, str(fd, "payment_ref", 120) || null);
     try {
       const { logAudit } = await import("@/lib/audit");
       await logAudit({
@@ -75,6 +92,84 @@ export async function updateTechnextBookingAction(fd: FormData) {
       });
     }
     return "Booking updated.";
+  });
+}
+
+export async function processRefundAction(fd: FormData) {
+  const admin = await requireAdmin();
+  const purpose = str(fd, "purpose", 20) as "technext" | "conference" | "event";
+  const id = str(fd, "id", 60);
+  const password = str(fd, "refund_password", 100);
+  const reason = str(fd, "refund_reason", 300) || "Authorized refund";
+  const back = str(fd, "back", 200) || (purpose === "technext" ? "/admin/technext" : purpose === "conference" ? "/admin/conference" : "/admin/events");
+
+  await guarded(back, async () => {
+    if (!password) {
+      throw new PortalError("Refund authorization password is required.");
+    }
+    const { hasRefundPassword, verifyRefundPassword } = await import("@/lib/refund");
+    const configured = await hasRefundPassword();
+    if (!configured) {
+      throw new PortalError("Refund security password has not been configured yet. Please configure it in the ieeeitsvitscore@gmail.com profile first.");
+    }
+    const valid = await verifyRefundPassword(password);
+    if (!valid) {
+      throw new PortalError("Incorrect refund authorization password. Refund rejected.");
+    }
+
+    if (purpose === "technext") {
+      const b = await first<{ id: string; organization_name: string; contact_name: string; email: string; payment_status: string; payment_amount: number; payment_currency: string }>(
+        "SELECT id, organization_name, contact_name, email, payment_status, payment_amount, payment_currency FROM technext_bookings WHERE id = ?",
+        [id]
+      );
+      if (!b) throw new PortalError("Booking not found.");
+      if (b.payment_status !== "paid") {
+        throw new PortalError("Only successfully paid bookings can be refunded.");
+      }
+
+      await run(
+        `UPDATE technext_bookings
+         SET payment_status = 'refunded',
+             status = 'cancelled',
+             admin_notes = COALESCE(admin_notes || '\n', '') || ?,
+             updated_at = ?
+         WHERE id = ?`,
+        [`[REFUNDED on ${new Date().toISOString()} by ${admin.email}] Reason: ${reason}`, now(), id]
+      );
+
+      await run("UPDATE payments SET status = 'refunded', updated_at = ? WHERE purpose = 'technext' AND ref_id = ?", [now(), id]).catch(() => {});
+
+      try {
+        const { logAudit } = await import("@/lib/audit");
+        await logAudit({
+          userId: admin.id,
+          userEmail: admin.email,
+          userName: admin.name,
+          action: "records.refund_processed",
+          category: "records",
+          path: "/admin/technext",
+          details: { purpose: "technext", bookingId: id, amount: b.payment_amount, currency: b.payment_currency, reason },
+        });
+      } catch {}
+
+      try {
+        const { notify } = await import("@/lib/notifications");
+        const { formatMoney } = await import("@/lib/settings");
+        await notify("payment_received", {
+          to: b.email,
+          name: b.contact_name,
+          scope: "technext",
+          vars: {
+            item: `TechNext '28 Stall Booking (REFUNDED - ${reason})`,
+            amount: formatMoney(b.payment_amount, b.payment_currency),
+            invoiceNumber: "REFUNDED",
+            paymentRef: "REFUND-PROCESSED",
+          },
+        });
+      } catch {}
+    }
+
+    return "Refund processed successfully. Record marked as refunded and status updated.";
   });
 }
 
