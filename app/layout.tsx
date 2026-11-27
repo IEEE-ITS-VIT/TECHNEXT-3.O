@@ -56,10 +56,10 @@ export const metadata: Metadata = {
   keywords: ["TechNext '28", "TechNext expo", "industrial expo VIT", "innovation showcase", "startup stalls", "VIT Vellore", "ic-ETITE'28"],
   icons: {
     icon: [
-      { url: "/favicon.ico?v=3", sizes: "any" },
-      { url: "/icon.png?v=3", type: "image/png", sizes: "512x512" },
+      { url: "/favicon.ico?v=4", sizes: "any" },
+      { url: "/icon.png?v=4", type: "image/png", sizes: "512x512" },
     ],
-    apple: [{ url: "/apple-icon.png?v=3", sizes: "180x180" }],
+    apple: [{ url: "/apple-icon.png?v=4", sizes: "180x180" }],
   },
   category: "technology",
   openGraph: {
