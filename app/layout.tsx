@@ -102,7 +102,7 @@ export default async function RootLayout({
               eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
               location: { "@type": "Place", name: "Vellore Institute of Technology", address: "Vellore, Tamil Nadu, India" },
               organizer: { "@type": "CollegeOrUniversity", name: "Vellore Institute of Technology, Vellore", url: "https://vit.ac.in" },
-            }),
+            }).replace(/</g, "\\u003c"),
           }}
         />
       </head>
