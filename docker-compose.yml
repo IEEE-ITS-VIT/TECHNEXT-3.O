@@ -1,0 +1,14 @@
+services:
+  technext-portal:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: technext-portal
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=production
+      - PORT=3002

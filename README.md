@@ -1,53 +1,113 @@
-# TechNext '28 — Website & Portal
+# TechNext '28 — Expo Website & Portal
 
-Website and portal for **TechNext '28**, the national industrial expo and innovation showcase at VIT Vellore, held alongside ic-ETITE'28.
+Production website and portal for **TechNext '28**, the national industrial expo and innovation showcase organized by the IEEE ITS Student Chapter and SCORE at VIT Vellore, held alongside ic-ETITE'28.
 
-This is one of three websites that share one database and one login:
+Live URL: [https://technext-3-0.vercel.app](https://technext-3-0.vercel.app)
 
-| Website | Repository | Local port |
-| --- | --- | --- |
-| ic-ETITE'28 conference | `likhithm123/website` / `ieeeitsvitscore-ai/ic-etite28` | 3000 |
-| BOLT 3.0 hackathon | `IEEEITSVIT/BOLT-3.0` | 3001 |
-| TechNext '28 expo | `IEEEITSVIT/TECHNEXT-3.O` | 3002 |
+---
 
-- **One account everywhere.** The `users` table is shared, so an account made on any of the three works on all of them. If someone tries to sign up with an email that already exists, they are sent to the login page with their email filled in and told to use their existing password (or "Forgot password?").
-- **Separate admin portals.** TechNext '28's admin, CMS, payments and settings are only on this website. Admin and evaluator roles are per site (`site_roles` table); existing ic-ETITE admins (and BOLT evaluators) were copied over once when the sites were split, and from then on roles are managed separately in each site's Users page. People listed in `ADMIN_EMAILS` become admins of this site when they log in.
-- **Separate payments.** This site has its own payment provider settings (Admin → Site content → Payments), its own `VIT_PAYMENT_*` keys and its own `/api/payments/callback`. It only takes payments for stall bookings.
-- **Shared email.** All three use the same SMTP account (Admin → Email & SMTP, or `SMTP_*` env vars) and its daily limit is counted across all three. Each site sends its own queue.
+## 1. System Architecture
 
-## What's here
+TechNext '28 is part of the three-portal IEEE ITS VIT ecosystem:
 
-- `/` — the TechNext '28 page (about, gallery, expo categories, stall types, register)
-- `/register` — book a stall (organisation details, stall type, representatives); admins approve, then payment opens
-- `/dashboard` — my booking, payment, invoices, certificates; `/login`, `/signup`, password reset
+| Application | Role | Repository | Default Port | Production Domain |
+| :--- | :--- | :--- | :--- | :--- |
+| **ic-ETITE'28** | Conference Website, Registrations, Invoices, Gateway | `IEEEITSVIT/ic-etite28` | `3000` | `https://ic-etite28.vercel.app` |
+| **BOLT 3.0** | Flagship Hackathon, Team Scoring, Rounds, Evaluations | `IEEEITSVIT/BOLT-3.0` | `3001` | `https://bolt-3-0.vercel.app` |
+| **TechNext '28** (This repo) | Technology Expo, Stall Bookings, Industry Showcase | `IEEEITSVIT/TECHNEXT-3.O` | `3002` | `https://technext-3-0.vercel.app` |
 
-Admin portal (`/admin`): Site content (stall types and prices, booking dates, early bird, awards, booking open/closed, announcement bar, appearance, payments, invoice template, website links), Page content (edit every text/image with live preview), Stall bookings (approve/reject, payments, emails, certificates, export), Invoices, Certificates from Excel, Users & roles, Email & SMTP.
+### Key Features
+- **One Common Login:** A single account works seamlessly across all three websites.
+- **Stall Booking Engine:** Organization applications, stall tier selections, early-bird rates, admin approvals, and payment reconciliation.
+- **Dedicated Admin Portal:** Accessible at `/admin` for stall reviews, invoice management, and CMS live visual editing.
+- **Caching & Telemetry:** Powered by Upstash Redis (`lib/cache/redis.ts`) and Upstash QStash/Kafka (`lib/queue/kafka.ts`).
 
-## Run locally
+---
 
+## 2. Cloudflare D1 Database & Gateway
+
+All persistent data is stored in the shared Cloudflare D1 database (`ieeeitsvit`), accessed via the HTTPS Gateway Worker (`workers/d1-gateway`).
+
+- **Database Name:** `ieeeitsvit` (or `icetite`)
+- **Database ID:** `6d59618c-0ce8-4a86-9773-9918c1733e1e`
+- **Cloudflare Account ID:** `dfc2c80c18c70fffd6da339251650e04`
+
+All 15 schema migrations reside in `db/migrations/`. To apply them:
 ```bash
-npm install
-cp .env.example .env.local   # same D1 gateway, SESSION_SECRET and SMTP values as ic-ETITE
-npm run dev                  # http://localhost:3002
+for file in db/migrations/*.sql; do
+  npx wrangler d1 execute ieeeitsvit --remote --file="$file"
+done
 ```
 
-`.env.local` also needs:
+---
 
+## 3. Backups, Recovery & Replicas
+
+The repo includes a dedicated disaster recovery script:
+```bash
+# Backup live D1 database
+./scripts/d1-backup-restore.sh backup ieeeitsvit
+
+# Restore from snapshot
+./scripts/d1-backup-restore.sh restore ./backups/d1_ieeeitsvit_<timestamp>.sql ieeeitsvit
+
+# Point-In-Time-Recovery (Time Travel)
+./scripts/d1-backup-restore.sh timetravel 2026-11-28T00:00:00Z ieeeitsvit
+
+# Create secondary parallel replica for load testing
+./scripts/d1-backup-restore.sh replica-create technext-test-replica ieeeitsvit
 ```
-NEXT_PUBLIC_SITE_URL=http://localhost:3002
-NEXT_PUBLIC_ICETITE_URL=http://localhost:3000
-NEXT_PUBLIC_BOLT_URL=http://localhost:3001
-NEXT_PUBLIC_TECHNEXT_URL=http://localhost:3002
+
+---
+
+## 4. Deployment Guide
+
+### Option A: Vercel (Serverless)
+1. Import repository into Vercel.
+2. In Project Settings -> Environment Variables, configure the variables listed in Section 5.
+3. In Integrations, connect Upstash to auto-populate Redis and QStash credentials.
+4. Deploy.
+
+### Option B: Docker Container (Any VPS / Linux Server)
+```bash
+cp .env.example .env.local
+docker compose up -d --build
+```
+Port `3002` is exposed for the containerized application.
+
+### Option C: PM2 / Node.js Standalone
+```bash
+export STANDALONE=true
+npm ci
+npm run build
+pm2 start .next/standalone/server.js --name "technext-portal" -- -p 3002
 ```
 
-The database (Cloudflare D1 `icetite`), its migrations and the D1 gateway Worker live in the **ic-ETITE repository** (`db/migrations`, `workers/d1-gateway`). Run the gateway from there (`npx wrangler dev --config workers/d1-gateway/wrangler.toml --local --port 8788`).
+---
 
-## Deploy (Vercel)
+## 5. Complete Environment Variables Catalog
 
-1. Import this repository as a new Vercel project.
-2. Environment variables: copy `D1_GATEWAY_URL`, `D1_GATEWAY_SECRET`, `SESSION_SECRET`, `SMTP_*` and `CRON_SECRET` from the ic-ETITE project (they must match: same database, same session secret for encrypted SMTP passwords). Set `NEXT_PUBLIC_SITE_URL` to this site's domain, `ADMIN_EMAILS` for this site's admins, and the `VIT_PAYMENT_*` keys for this site's gateway.
-3. Deploy, attach the domain, then in **ic-ETITE's** Admin → Site content → Website links set the TechNext '28 address. Set the other two addresses here in this site's Admin → Site content → Website links.
+| Variable | Required | Description | Example / Default |
+| :--- | :--- | :--- | :--- |
+| `D1_GATEWAY_URL` | Yes | HTTPS endpoint of the D1 Gateway Worker | `https://icetite-d1-gateway.workers.dev` |
+| `D1_GATEWAY_SECRET` | Yes | Shared secret with D1 Worker | `64-char-random-secret` |
+| `SESSION_SECRET` | Yes | 32+ character key for session encryption | `min-32-char-random-hex-key` |
+| `NEXT_PUBLIC_SITE_URL` | Yes | Base URL of TechNext '28 | `https://technext-3-0.vercel.app` |
+| `NEXT_PUBLIC_ICETITE_URL`| Yes | Base URL of ic-ETITE'28 | `https://ic-etite28.vercel.app` |
+| `NEXT_PUBLIC_BOLT_URL` | Yes | Base URL of BOLT 3.0 | `https://bolt-3-0.vercel.app` |
+| `ADMIN_EMAILS` | No | Site admins | `ieeeitsvitscore@gmail.com` |
+| `UPSTASH_REDIS_REST_URL` | Optional | Upstash Redis REST URL | `https://...upstash.io` |
+| `UPSTASH_REDIS_REST_TOKEN`| Optional | Upstash Redis REST Bearer Token | `AX...` |
+| `UPSTASH_KAFKA_REST_URL` | Optional | Upstash QStash / Kafka URL | `https://qstash.upstash.io` |
+| `UPSTASH_KAFKA_REST_USERNAME`| Optional| Kafka / QStash Username | `user_...` |
+| `UPSTASH_KAFKA_REST_PASSWORD`| Optional| Kafka / QStash Password | `pass_...` |
+| `CRON_SECRET` | Yes | Vercel Cron authentication secret | `cron-random-secret` |
 
-## Code layout
+---
 
-Shared files (`lib/`, `components/portal`, `components/cms`, `components/admin`, auth pages, dashboard, admin portal) are kept identical in all three repositories; `lib/site.ts` says which site this is, and `SITE` switches decide what each site shows. Fix shared code in one repo and copy it to the other two.
+## 6. Security & Failover Runbook
+
+- **Default Administrator:** `ieeeitsvitscore@gmail.com` maintains immutable super-admin rights.
+- **Refund Control:** Requires the hashed authorization password set by `ieeeitsvitscore@gmail.com`.
+- **Audit Stream:** High-velocity actions are streamed to `portal-audit-events`.
+- **Database Fallback:** The application includes automated retries and exponential backoff to handle network drops gracefully.
